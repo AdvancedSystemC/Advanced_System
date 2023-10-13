@@ -14,6 +14,10 @@
 
 #include<getopt.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 #define STDOUT 1
 #define STDERR 2
@@ -180,10 +184,57 @@ int main(int argc, char** argv)
           "output",  bin_output_param, 
           "verbose", is_verbose_mode);
 
+  // I - Copie de Fichier
   // Business logic must be implemented at this point
+  int original;
+  int copy;
 
-  /* LOREM IPSUM DOT SIR AMET */
+  // In order to copy the content of one file to another , you first need to open both
+  // Opening first file in read only
+  original= open(bin_input_param, O_RDONLY);
+  if(original == -1){
+    fprintf(stderr ,"Error in opening the file, %s" , bin_input_param);
+    exit(1);
+  }
 
+  // Opening the second file ( create one if it does not exist) , with Read and Write permission
+  copy = open(bin_output_param,O_WRONLY|O_CREAT,0755);
+  if(copy == -1){
+    //We choose stderr as output stream for the error
+    fprintf(stderr , "Error in opening the file, %s" , bin_output_param);
+    exit(1);
+  }
+
+  /*printf("original file descriptor: %d\n", original);
+  printf("copy file descriptor: %d\n", copy);*/
+
+  int bytesRead;
+  int bytesWrote;
+
+  char* buffer = malloc(sizeof(char)*4096);
+
+  //Read the first block of 4096 bytes
+  bytesRead = read(original,buffer,4096);
+
+  //the loop stops when the block of bytes = 0
+  while(bytesRead > 0){
+    bytesWrote = write (copy,buffer, bytesRead);
+      
+    if(bytesWrote != bytesRead){
+      perror("Error while copying the file!");
+      exit(1);
+    }
+
+    //read the next block of bytes
+    bytesRead = read(original,buffer,4096);
+
+    // read function returns 0 when it reaches the EOF
+    if(bytesRead == 0){
+      printf("File copied successfully!\n");
+    }
+  }
+
+  free_if_needed(buffer);
 
   // Freeing allocated data
   free_if_needed(bin_input_param);
