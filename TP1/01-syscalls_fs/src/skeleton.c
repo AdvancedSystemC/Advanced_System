@@ -18,6 +18,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <dirent.h>
+#include <pwd.h>
+#include <grp.h>
+#include <time.h>
 
 #define STDOUT 1
 #define STDERR 2
@@ -108,6 +112,20 @@ static struct option binary_opts[] =
 const char* binary_optstr = "hvi:o:";
 
 
+/**
+ * 
+*/
+void print_file_metadata(const char* filename){
+  struct stat file_stat;
+  if(stat(filename, &file_stat) == -1){
+    perror("");
+    exit(1);
+  }
+
+  printf("%s - " , filename);
+} 
+
+
 
 /**
  * Binary main loop
@@ -185,7 +203,6 @@ int main(int argc, char** argv)
           "verbose", is_verbose_mode);
 
   // I - Copie de Fichier
-  // Business logic must be implemented at this point
   int original;
   int copy;
 
@@ -193,7 +210,7 @@ int main(int argc, char** argv)
   // Opening first file in read only
   original= open(bin_input_param, O_RDONLY);
   if(original == -1){
-    fprintf(stderr ,"Error in opening the file, %s" , bin_input_param);
+    fprintf(STDERR ,"Error in opening the file, %s" , bin_input_param);
     exit(1);
   }
 
@@ -201,7 +218,7 @@ int main(int argc, char** argv)
   copy = open(bin_output_param,O_WRONLY|O_CREAT,0755);
   if(copy == -1){
     //We choose stderr as output stream for the error
-    fprintf(stderr , "Error in opening the file, %s" , bin_output_param);
+    fprintf(STDERR , "Error in opening the file, %s" , bin_output_param);
     exit(1);
   }
 
@@ -234,11 +251,50 @@ int main(int argc, char** argv)
     }
   }
 
-  free_if_needed(buffer);
+  // II - Print << reverse >>
+  int file;
+  int n;
+
+  file = open(bin_input_param, O_RDONLY);
+  if(file == -1){
+    fprintf(STDERR ,"Error in opening the file, %s" , bin_input_param);
+    exit(1);
+  }
+
+  off_t offset = lseek(file, 0, SEEK_END);
+  //char* buffer = malloc(sizeof(char)*4096);
+
+  for(int i = offset -1; i >= 0 ; i--){
+    lseek(file, (off_t)i , SEEK_SET);
+    n = read(file,buffer,1);
+    fprintf(STDOUT , "%c",buffer[0]);
+  }
+
+  close(file);
+
+
+  // III - ls "like"
+
+  //Open the directory given in arguments
+  DIR* directory = opendir(bin_input_param);
+  if(directory == NULL){
+    perror("");
+  }
+
+  struct dirent* entry = NULL;
+
+  while((entry = readdir(directory)) != NULL){
+    if(entry->d_type == DT_REG){
+      print_file_metadata(entry->d_name);
+    }
+  }
+
+  closedir(directory);
 
   // Freeing allocated data
   free_if_needed(bin_input_param);
   free_if_needed(bin_output_param);
+  free_if_needed(buffer);
 
 
   return EXIT_SUCCESS;
