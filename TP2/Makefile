@@ -1,63 +1,30 @@
-CC=gcc
-CFLAGS=-Wall -c
-LDFLAGS=-I ./include/
+CC = gcc
+CFLAGS = -Wall -Wextra
 
-SRC_DIR=./src
-INC_DIR=./include
-BIN_DIR=./bin
-DOC_DIR=./doc
-GCOV_DIR=./gcov
+SRC_DIR = src
+BIN_DIR = bin
 
-GCOVFLAGS=-O0 --coverage -lgcov -Wall -g
+EXE1 = $(BIN_DIR)/Exo1
+EXE2 = $(BIN_DIR)/Exo2
 
-LCOV_REPORT=report.info
+SRCS1 = $(wildcard $(SRC_DIR)/Exo1.c)
+SRCS2 = $(wildcard $(SRC_DIR)/Exo2.c)
 
-SRC=$(wildcard $(SRC_DIR)/*.c)
-OBJ=$(SRC:.c=.o)
-EXEC=redirect
+OBJS1 = $(SRCS1:.c=.o)
+OBJS2 = $(SRCS2:.c=.o)
 
-GEXEC=$(EXEC).cov
+.PHONY: all clean
 
-AR_NAME=archive_$(EXEC).tar.gz
+all: $(EXE1) $(EXE2)
 
+$(EXE1): $(OBJS1)
+	$(CC) $(CFLAGS) $^ -o $@
 
-all: $(SRC) $(EXEC)
-    
-%.o:%.c
-	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
+$(EXE2): $(OBJS2)
+	$(CC) $(CFLAGS) $^ -o $@
 
-$(EXEC): $(OBJ) 
-	$(CC) -o $(BIN_DIR)/$@ -Wall $(LDFLAGS) $(OBJ)
+$(SRC_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(GEXEC):
-	$(CC) $(GCOVFLAGS) -o $(GCOV_DIR)/$@ -Wall $(LDFLAGS) $(SRC)
-
-doc:
-	doxygen $(DOC_DIR)/doxygen.conf
-
-gcov: $(GEXEC)
-	# generate some data for gcov by calling the generated binary with various options
-	$(GCOV_DIR)/$(GEXEC) -h
-	$(GCOV_DIR)/$(GEXEC) -i input -o output -v
-
-	find ./ -maxdepth 1 -name *.gcno -exec mv {} $(GCOV_DIR) \;
-	find ./ -maxdepth 1 -name *.gcda -exec mv {} $(GCOV_DIR) \;
-
-	gcov -o $(GCOV_DIR) $(GEXEC)
-	lcov -o $(GCOV_DIR)/$(LCOV_REPORT) -c -f -d $(GCOV_DIR)
-	genhtml -o $(GCOV_DIR)/report $(GCOV_DIR)/$(LCOV_REPORT)
-
-package: gcov doc all
-	rm -rf $(AR_NAME)
-	tar cvfz $(AR_NAME) ./*
-
-clean:	
-	rm -rf $(OBJ)
-
-mrproper: clean
-	rm -rf $(BIN_DIR)/*
-	rm -rf $(DOC_DIR)/latex/
-	rm -rf $(DOC_DIR)/html/
-	rm -rf $(GCOV_DIR)/*
-
-.PHONY: doc
+clean:
+	rm -f $(OBJS1) $(OBJS2) $(EXE1) $(EXE2)
