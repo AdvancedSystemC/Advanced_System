@@ -3,49 +3,21 @@
 #include <stdlib.h> 
 #include <unistd.h> 
 
-// Greeting shell during startup 
+FILE* historyFile;
 
-typedef struct Node {
+void addCommandToHistory(const char* command) {
+    historyFile = fopen("history.txt", "a+"); // Open history file in append mode
+    fprintf(historyFile, "%s\n", command);
+    fclose(historyFile);
+}
+
+void printCommandHistory() {
     char command[100];
-    struct Node* prev;
-    struct Node* next;
-}CommandNode;
-
-CommandNode* createNode(const char* command){
-    CommandNode* newNode = (CommandNode*)malloc(sizeof(CommandNode));
-    strcpy(newNode->command,command);
-    newNode->prev = NULL;
-    newNode->next = NULL;
-    return newNode;
-}
-
-void addCommandToHistory(CommandNode** history, const char* command){
-    CommandNode* newNode = createNode(command);
-
-    if(*history == NULL){
-        *history = newNode;
-    }
-    else{
-        newNode->next=*history;
-        (*history)->prev = newNode;
-        *history = newNode;
-    }
-}
-
-void printCommandHistory(CommandNode* history){
     int count = 1;
-    while(history != NULL){
-        printf("%d. %s\n", count, history->command);
-        history = history->next;
+    rewind(historyFile); // Move file pointer to the beginning
+    while (fgets(command, sizeof(command), historyFile) != NULL) {
+        printf("%d. %s", count, command);
         count++;
-    }
-}
-
-void freeCommandHistory(CommandNode* history){
-    while(history != NULL){
-        CommandNode* temp = history;
-        history = history-> next;
-        free(temp);
     }
 }
 
@@ -76,21 +48,20 @@ char* getDirectory(){
 
 int main()
 {
-    CommandNode* history = NULL;
-
-    //Test historique
-    addCommandToHistory(&history,"ls");
-    addCommandToHistory(&history,"cd ..");
-    addCommandToHistory(&history,"touch historique");
-    printCommandHistory(history);
-    
     char* username = getenv("USER");
     char input[1024];
     init_shell();
 
+    //Test historique
+    addCommandToHistory("ls");
+    addCommandToHistory("cd ..");
+    addCommandToHistory("touch historique");
+    printCommandHistory();
+
     while (1){
         printf("%s:%s$",username,getDirectory());
         fgets(input, sizeof(input), stdin);
+        addCommandToHistory(input);
         printf("\n");
     }
 
