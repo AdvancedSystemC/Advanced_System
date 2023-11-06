@@ -2,3 +2,12 @@ touch historique
 ls
 cd ..
 touch historique
+ls
+cd ..
+touch historique
+aaa
+
+bb
+
+je suis une merde
+
