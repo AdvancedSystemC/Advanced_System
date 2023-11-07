@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "display.h"
-#include "colors.h"
+#include "../include/display.h"
+#include "../include/colors.h"
 
 void display_welcome() 
 { 

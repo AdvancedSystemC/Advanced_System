@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "history.h"
+#include "../include/history.h"
 
 FILE* historyFile;
 

@@ -4,6 +4,7 @@ LDFLAGS=-I ./include/
 
 SRC_DIR=./src
 INC_DIR=./include
+OBJ_DIR=./obj
 BIN_DIR=./bin
 DOC_DIR=./doc
 GCOV_DIR=./gcov
@@ -12,31 +13,38 @@ GCOVFLAGS=-O0 --coverage -lgcov -Wall -g
 
 LCOV_REPORT=report.info
 
-SRC=$(wildcard $(SRC_DIR)/*.c)
-OBJ=$(SRC:.c=.o)
+SRC_FILES=$(wildcard $(SRC_DIR)/*.c)
+INC_FILES=$(wildcard $(INC_DIR)/*.h)
+OBJ_FILES=$(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
+
 EXEC=my_sh
 
 GEXEC=$(EXEC).cov
 
 AR_NAME=archive_$(EXEC).tar.gz
 
+all: $(OBJ_DIR) $(BIN_DIR) $(SRC_FILES) $(EXEC)
 
-all: $(SRC) $(EXEC)
-    
-%.o:%.c
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_FILES)
 	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
 
-$(EXEC): $(OBJ) 
-	$(CC) -o $(BIN_DIR)/$@ -Wall $(LDFLAGS) $(OBJ)
+$(EXEC): $(OBJ_FILES)
+	$(CC) -o $(BIN_DIR)/$@ -Wall $(LDFLAGS) $(OBJ_FILES)
 
 $(GEXEC):
-	$(CC) $(GCOVFLAGS) -o $(GCOV_DIR)/$@ -Wall $(LDFLAGS) $(SRC)
+	$(CC) $(GCOVFLAGS) -o $(GCOV_DIR)/$@ -Wall $(LDFLAGS) $(SRC_FILES)
 
 doc:
 	doxygen $(DOC_DIR)/doxygen.conf
 
 gcov: $(GEXEC)
-	# generate some data for gcov by calling the generated binary with various options
+	# Generate some data for gcov by calling the generated binary with various options
 	$(GCOV_DIR)/$(GEXEC) -h
 	$(GCOV_DIR)/$(GEXEC) -i input -o output -v
 
@@ -50,13 +58,11 @@ gcov: $(GEXEC)
 package: gcov doc all
 	rm -rf $(AR_NAME)
 	tar cvfz $(AR_NAME) ./*
-clean:	
-	rm -rf $(OBJ)
+
+clean:
+	rm -rf $(OBJ_DIR) $(BIN_DIR)/*
 
 mrproper: clean
-	rm -rf $(BIN_DIR)/*
 	rm -rf $(DOC_DIR)/latex/
 	rm -rf $(DOC_DIR)/html/
 	rm -rf $(GCOV_DIR)/*
-
-.PHONY: doc
