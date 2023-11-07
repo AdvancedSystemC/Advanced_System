@@ -5,6 +5,18 @@
 
 FILE* historyFile;
 
+void green() {
+    printf("\033[0;32m");
+}
+
+void blue() {
+    printf("\033[0;34m");
+}
+
+void reset () {
+  printf("\033[0m");
+}
+
 void addCommandToHistory(const char* command) {
     historyFile = fopen("history.txt", "a+"); // Open history file in append mode
     fprintf(historyFile, "%s\n", command);
@@ -59,10 +71,16 @@ int main()
     printCommandHistory();
 
     while (1){
-        printf("%s:%s$",username,getDirectory());
+        green();
+        printf("%s",username);
+        reset();
+        printf(":");
+        blue();
+        printf("%s",getDirectory());
+        reset();
+        printf("$ ");
         fgets(input, sizeof(input), stdin);
         addCommandToHistory(input);
-        printf("\n");
     }
 
     return 0;
