@@ -1,0 +1,9 @@
+exit
+ps
+history
+exit
+history
+history
+exit
+history
+exit
