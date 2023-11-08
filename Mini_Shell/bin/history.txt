@@ -19,3 +19,29 @@ bbb
 bbb
 history
 exit
+alias ll = ls -l
+exit
+alias ll = ls -l
+exit
+alias ll = ls -l
+alias
+alias ll
+exit
+alias ll = ls -l
+alias ll
+alias
+alias ll = ls -l
+alias
+alias
+alias
+alias ll
+unalias ll
+cd ..
+exit
+alias ll
+exit
+alias ll = ls -l
+alias ll = ls -l
+alias-save
+alias
+exit

@@ -7,6 +7,8 @@
 #include "../include/display.h"
 #include "../include/commands.h"
 #include "../include/input.h"
+#include "../include/typedef.h"
+#include "../include/alias.h"
 
 char* getDirectory(){
     char* cwd = (char*)malloc(sizeof(char) * 1024);
@@ -27,13 +29,15 @@ void free_tokens(char* toks[],int count){
 
 int main()
 {
+    initAliasManager();
+
     if(isatty(STDIN_FILENO)){
         //shell is running in interactive mode
         char* username = getenv("USER");
         char hostname[1024];
         gethostname(hostname,sizeof(hostname));
         char input[1024];
-        const char* delimiter = " \t\n"; // Define the token delimiter
+        const char* delimiter = " \t\n="; // Define the token delimiter
 
         display_welcome();
 
@@ -50,6 +54,7 @@ int main()
             //Execute command here
             execute_command(toks);
 
+            //TO DO Fix free tokens
             //free_tokens(toks,sizeof(toks)/sizeof(toks[0]));
         }
     }

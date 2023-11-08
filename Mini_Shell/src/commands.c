@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+
 #include "../include/commands.h"
-#include "../include/history.h" // Include the necessary headers for command functionality.
+#include "../include/history.h" 
+#include "../include/alias.h"
 
 int execute_command(char* toks[]){
     if(toks[0] == NULL){
@@ -11,6 +13,7 @@ int execute_command(char* toks[]){
 
     //Exit built-in command
     if(strcmp(toks[0],"exit") == 0){
+        cleanupAliasManager();
         execute_exit();
     }
 
@@ -22,6 +25,56 @@ int execute_command(char* toks[]){
     //History built-in command
     if(strcmp(toks[0],"history") == 0){
         execute_history();
+    }
+
+    //alias built-in command
+    if(strcmp(toks[0],"alias") == 0){
+        if(toks[1] != NULL && toks[2] != NULL){
+
+            // Concatenate all tokens after the "=" character
+            int command_length = 0;
+            for (int i = 2; toks[i] != NULL; i++) {
+                command_length += strlen(toks[i]);
+            }
+
+            char* command = malloc((command_length + 1) * sizeof(char));
+            command[0] = '\0'; // Initialize the command string as an empty string
+
+            for (int i = 2; toks[i] != NULL; i++) {
+                strcat(command, toks[i]);
+                if (toks[i + 1] != NULL) {
+                    strcat(command, " "); // Add a space between tokens
+                }
+            }
+
+            addAlias(toks[1],command);
+        }
+        else if(toks[1] == NULL && toks[2] == NULL){
+            listAliases();
+        }
+        else if(toks[1] != NULL && toks[2] == NULL){
+            printf(lookupAlias(toks[1]));
+            printf("\n");
+        }
+        else{
+            printf(toks[1]);
+            printf("Error alias");
+        }
+
+    }
+
+    if(strcmp(toks[0],"unalias") == 0){
+        deleteAlias(toks[1]);
+    }
+
+    //alias-save built-in command
+    if(strcmp(toks[0],"alias-save") == 0){
+        SaveAliases();
+    }
+
+    //alias-load built-in command
+    if(strcmp(toks[0],"alias-load") == 0){
+        LoadAliases();
     }
 
     return 1;
@@ -74,7 +127,6 @@ int execute_ps() {
 }
 
 int execute_history() {
-    // Logic for the "history" command.
-    printCommandHistory(); // Assuming you have a function for printing command history.
-    return 1; // Indicate that the shell should continue.
+    printCommandHistory();
+    return 1;
 }
