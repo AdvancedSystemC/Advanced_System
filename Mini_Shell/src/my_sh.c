@@ -10,6 +10,10 @@
 #include "../include/typedef.h"
 #include "../include/alias.h"
 
+/**
+ * @brief Get the current working directory.
+ * @return The current working directory as a string.
+ */
 char* getDirectory(){
     char* cwd = (char*)malloc(sizeof(char) * 1024);
     if(getcwd(cwd,1024) != NULL){
@@ -21,12 +25,22 @@ char* getDirectory(){
     }
 }
 
+/**
+ * @brief Free the memory allocated for an array of tokens.
+ * @param toks The array of tokens.
+ * @param count The number of tokens in the array.
+ */
 void free_tokens(char* toks[],int count){
     for(int i = 0; i < count; i++){
         free(toks[i]);
     }
 }
 
+
+/**
+ * @brief The main function of the shell program.
+ * @return 0 on successful execution.
+ */
 int main()
 {
     initAliasManager();
@@ -50,6 +64,9 @@ int main()
 
             char* toks[1024];
             process_input(input, delimiter, toks);
+
+            //TO DO
+            // Separate input into command / options / path
 
             //Execute command here
             execute_command(toks);
