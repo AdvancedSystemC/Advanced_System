@@ -1,0 +1,121 @@
+\hypertarget{alias_8h}{}\doxysection{/home/bduvernay/\+Advanced\+\_\+\+System/\+Mini\+\_\+\+Shell/include/alias.h File Reference}
+\label{alias_8h}\index{/home/bduvernay/Advanced\_System/Mini\_Shell/include/alias.h@{/home/bduvernay/Advanced\_System/Mini\_Shell/include/alias.h}}
+
+
+This file contains function declarations for alias-\/related operations.  
+
+
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{alias_8h_a1ea93675f5f9ae6e222c2bd7c9903d17}\label{alias_8h_a1ea93675f5f9ae6e222c2bd7c9903d17}} 
+void \mbox{\hyperlink{alias_8h_a1ea93675f5f9ae6e222c2bd7c9903d17}{init\+Alias\+Manager}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the alias manager. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{alias_8h_a9abeba3bdb1c590bebf5448677c82407}{add\+Alias}} (const char $\ast$name, const char $\ast$command)
+\begin{DoxyCompactList}\small\item\em Add a new alias to the manager. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{alias_8h_a61b8812350ec5af1e38b207dd53f4176}{delete\+Alias}} (const char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Delete a new alias to the manager. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{alias_8h_aaa5a6e6b315438dd771adbf22acaa23b}\label{alias_8h_aaa5a6e6b315438dd771adbf22acaa23b}} 
+void \mbox{\hyperlink{alias_8h_aaa5a6e6b315438dd771adbf22acaa23b}{list\+Aliases}} ()
+\begin{DoxyCompactList}\small\item\em Lists all defined aliases. \end{DoxyCompactList}\item 
+const char $\ast$ \mbox{\hyperlink{alias_8h_aefaf41292d74017e32bf21974cb34ac5}{lookup\+Alias}} (const char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Looks up the command associated with the given alias. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{alias_8h_a7cb83eacfa72310140ad5a4c1653ce36}{Load\+Aliases}} ()
+\begin{DoxyCompactList}\small\item\em Load aliases from a file for persistence. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{alias_8h_a516a10a45cd6f78dea9f4f2da2a3ccee}{Save\+Aliases}} ()
+\begin{DoxyCompactList}\small\item\em Save aliases to a file for persistence. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{alias_8h_af1250fa6407800ac87deb6976c77fba6}\label{alias_8h_af1250fa6407800ac87deb6976c77fba6}} 
+void \mbox{\hyperlink{alias_8h_af1250fa6407800ac87deb6976c77fba6}{cleanup\+Alias\+Manager}} ()
+\begin{DoxyCompactList}\small\item\em Cleans up ressources used by the alias manager. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This file contains function declarations for alias-\/related operations. 
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{alias_8h_a9abeba3bdb1c590bebf5448677c82407}\label{alias_8h_a9abeba3bdb1c590bebf5448677c82407}} 
+\index{alias.h@{alias.h}!addAlias@{addAlias}}
+\index{addAlias@{addAlias}!alias.h@{alias.h}}
+\doxysubsubsection{\texorpdfstring{addAlias()}{addAlias()}}
+{\footnotesize\ttfamily int add\+Alias (\begin{DoxyParamCaption}\item[{const char $\ast$}]{name,  }\item[{const char $\ast$}]{command }\end{DoxyParamCaption})}
+
+
+
+Add a new alias to the manager. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & The name of the aliases \\
+\hline
+{\em command} & The command associated with the alias \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if the alias is added succesfully otherwise 0 
+\end{DoxyReturn}
+\mbox{\Hypertarget{alias_8h_a61b8812350ec5af1e38b207dd53f4176}\label{alias_8h_a61b8812350ec5af1e38b207dd53f4176}} 
+\index{alias.h@{alias.h}!deleteAlias@{deleteAlias}}
+\index{deleteAlias@{deleteAlias}!alias.h@{alias.h}}
+\doxysubsubsection{\texorpdfstring{deleteAlias()}{deleteAlias()}}
+{\footnotesize\ttfamily int delete\+Alias (\begin{DoxyParamCaption}\item[{const char $\ast$}]{name }\end{DoxyParamCaption})}
+
+
+
+Delete a new alias to the manager. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & The name of the aliases \\
+\hline
+{\em command} & The command associated with the alias \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if the alias is removed succesfully otherwise 0 
+\end{DoxyReturn}
+\mbox{\Hypertarget{alias_8h_a7cb83eacfa72310140ad5a4c1653ce36}\label{alias_8h_a7cb83eacfa72310140ad5a4c1653ce36}} 
+\index{alias.h@{alias.h}!LoadAliases@{LoadAliases}}
+\index{LoadAliases@{LoadAliases}!alias.h@{alias.h}}
+\doxysubsubsection{\texorpdfstring{LoadAliases()}{LoadAliases()}}
+{\footnotesize\ttfamily int Load\+Aliases (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Load aliases from a file for persistence. 
+
+\begin{DoxyReturn}{Returns}
+1 if aliases are loaded successfully , 0 otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{alias_8h_aefaf41292d74017e32bf21974cb34ac5}\label{alias_8h_aefaf41292d74017e32bf21974cb34ac5}} 
+\index{alias.h@{alias.h}!lookupAlias@{lookupAlias}}
+\index{lookupAlias@{lookupAlias}!alias.h@{alias.h}}
+\doxysubsubsection{\texorpdfstring{lookupAlias()}{lookupAlias()}}
+{\footnotesize\ttfamily const char$\ast$ lookup\+Alias (\begin{DoxyParamCaption}\item[{const char $\ast$}]{name }\end{DoxyParamCaption})}
+
+
+
+Looks up the command associated with the given alias. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & The name of the alias to be looked up \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The command associated with the alias or \char`\"{}\+Alias not found\char`\"{} if the alias is not found 
+\end{DoxyReturn}
+\mbox{\Hypertarget{alias_8h_a516a10a45cd6f78dea9f4f2da2a3ccee}\label{alias_8h_a516a10a45cd6f78dea9f4f2da2a3ccee}} 
+\index{alias.h@{alias.h}!SaveAliases@{SaveAliases}}
+\index{SaveAliases@{SaveAliases}!alias.h@{alias.h}}
+\doxysubsubsection{\texorpdfstring{SaveAliases()}{SaveAliases()}}
+{\footnotesize\ttfamily int Save\+Aliases (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Save aliases to a file for persistence. 
+
+\begin{DoxyReturn}{Returns}
+1 if aliases are saved successfully , 0 otherwise 
+\end{DoxyReturn}
