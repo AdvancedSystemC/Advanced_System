@@ -45,3 +45,29 @@ alias ll = ls -l
 alias-save
 alias
 exit
+cd ..
+cd 
+cd ..
+ls
+exit
+ps
+exit
+cd ..
+cd
+exit
+pwsd
+pwd
+pwd
+pwd
+pwd
+pwd
+cd ..
+pwd
+echo $PWD
+echo $PATH
+echo "$PWD"
+exit
+who
+cd ..
+who
+who --help

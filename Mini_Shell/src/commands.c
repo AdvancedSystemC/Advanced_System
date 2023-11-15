@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <utmp.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <time.h>
 
 #include "../include/commands.h"
 #include "../include/history.h" 
@@ -20,6 +24,26 @@ int execute_command(char* toks[]){
     //Ps built-in command
     if(strcmp(toks[0],"ps") == 0){
         execute_ps();
+    }
+
+    //Cd built-in command
+    if(strcmp(toks[0],"cd") == 0){
+        execute_cd(toks);
+    }
+
+    //Pwd built-in command
+    if(strcmp(toks[0],"pwd") == 0){
+        execute_pwd();
+    }
+
+    //Echo built-in command
+    if(strcmp(toks[0],"echo") == 0){
+        execute_echo(toks);
+    }
+
+    //Who built-in command
+    if(strcmp(toks[0],"who") == 0){
+        execute_who();
     }
 
     //History built-in command
@@ -124,6 +148,76 @@ int execute_ps() {
     }
 
     closedir(proc_dir);
+}
+
+int execute_cd(char** toks) {
+    if (toks[1] == NULL) {
+        // No argument provided, change to home directory
+        chdir(getenv("HOME"));
+    } else {
+        if (chdir(toks[1]) != 0) {
+            perror("cd");
+        }
+    }
+    return 1;
+}
+
+int execute_pwd() {
+    char* cwd = (char*)malloc(sizeof(char) * 1024);
+    if(getcwd(cwd,1024) != NULL){
+        printf("%s\n",cwd);
+        return 1;
+    }
+    else{
+        perror("Cannot get current directory");
+        return NULL;
+    }
+}
+
+int execute_echo(char** toks) {
+    int i = 1;
+    while (toks[i] != NULL) {
+        if (toks[i][0] == '$') {
+            char* env_var = getenv(toks[i] + 1);
+            if (env_var != NULL) {
+                printf("%s ", env_var);
+            }
+        } else {
+            printf("%s ", toks[i]);
+        }
+        i++;
+    }
+    printf("\n");
+    return 1;
+}
+
+int execute_who() {
+    struct utmp current_record;
+    int utmpfd;
+    int reclen = sizeof(current_record);
+
+    if ((utmpfd = open(UTMP_FILE, O_RDONLY)) == -1) {
+        perror(UTMP_FILE);
+        exit(1);
+    }
+
+    while (read(utmpfd, &current_record, reclen) == reclen) {
+        if (current_record.ut_type == USER_PROCESS) {
+            printf("%-8.8s ", current_record.ut_user);
+            printf("%-8.8s ", current_record.ut_line);
+
+            time_t login_time = current_record.ut_tv.tv_sec;
+            struct tm *lt = localtime(&login_time);
+            char time_str[20];
+            strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", lt);
+
+            printf("%s ", time_str);
+            printf("(%s)\n", current_record.ut_host);
+        }
+    }
+
+    close(utmpfd);
+    return 1;
 }
 
 int execute_history() {
