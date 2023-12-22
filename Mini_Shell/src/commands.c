@@ -7,50 +7,10 @@
 #include <time.h>
 
 #include "../include/commands.h"
-#include "../include/history.h" 
+#include "../include/history.h"
 #include "../include/alias.h"
 
-int execute_command(char* toks[]){
-    if(toks[0] == NULL){
-        return 0;
-    }
-
-    //Exit built-in command
-    if(strcmp(toks[0],"exit") == 0){
-        cleanupAliasManager();
-        execute_exit();
-    }
-
-    //Ps built-in command
-    if(strcmp(toks[0],"ps") == 0){
-        execute_ps();
-    }
-
-    //Cd built-in command
-    if(strcmp(toks[0],"cd") == 0){
-        execute_cd(toks);
-    }
-
-    //Pwd built-in command
-    if(strcmp(toks[0],"pwd") == 0){
-        execute_pwd();
-    }
-
-    //Echo built-in command
-    if(strcmp(toks[0],"echo") == 0){
-        execute_echo(toks);
-    }
-
-    //Who built-in command
-    if(strcmp(toks[0],"who") == 0){
-        execute_who();
-    }
-
-    //History built-in command
-    if(strcmp(toks[0],"history") == 0){
-        execute_history();
-    }
-
+/*
     //alias built-in command
     if(strcmp(toks[0],"alias") == 0){
         if(toks[1] != NULL && toks[2] != NULL){
@@ -102,41 +62,50 @@ int execute_command(char* toks[]){
     }
 
     return 1;
-}
+}*/
 
-int execute_exit() {
+int execute_exit(char **args)
+{
     exit(0);
 }
 
-int execute_ps() {
-    DIR* proc_dir = opendir("/proc");
+int execute_ps(char **args)
+{
+    DIR *proc_dir = opendir("/proc");
 
-    if (!proc_dir) {
+    if (!proc_dir)
+    {
         perror("opendir");
         return;
     }
 
     printf("%-5s %-20s %s\n", "PID", "NAME", "STATUS");
 
-    struct dirent* entry;
-    while ((entry = readdir(proc_dir)) != NULL) {
-        if (entry->d_type == DT_DIR && isdigit(entry->d_name[0])) {
+    struct dirent *entry;
+    while ((entry = readdir(proc_dir)) != NULL)
+    {
+        if (entry->d_type == DT_DIR && isdigit(entry->d_name[0]))
+        {
             char status_path[256];
             snprintf(status_path, sizeof(status_path), "/proc/%s/status", entry->d_name);
 
-            FILE* status_file = fopen(status_path, "r");
-            if (status_file) {
+            FILE *status_file = fopen(status_path, "r");
+            if (status_file)
+            {
                 char line[256];
                 char name[256];
                 char status[256];
 
-                while (fgets(line, sizeof(line), status_file) != NULL) {
-                    if (sscanf(line, "Name: %s", name) == 1) {
+                while (fgets(line, sizeof(line), status_file) != NULL)
+                {
+                    if (sscanf(line, "Name: %s", name) == 1)
+                    {
                         break;
                     }
                 }
 
-                if (fgets(line, sizeof(line), status_file) != NULL) {
+                if (fgets(line, sizeof(line), status_file) != NULL)
+                {
                     sscanf(line, "State: %s", status);
                 }
 
@@ -150,39 +119,53 @@ int execute_ps() {
     closedir(proc_dir);
 }
 
-int execute_cd(char** toks) {
-    if (toks[1] == NULL) {
+int execute_cd(char **toks)
+{
+    if (toks[1] == NULL)
+    {
         // No argument provided, change to home directory
         chdir(getenv("HOME"));
-    } else {
-        if (chdir(toks[1]) != 0) {
+    }
+    else
+    {
+        if (chdir(toks[1]) != 0)
+        {
             perror("cd");
         }
     }
     return 1;
 }
 
-int execute_pwd() {
-    char* cwd = (char*)malloc(sizeof(char) * 1024);
-    if(getcwd(cwd,1024) != NULL){
-        printf("%s\n",cwd);
+int execute_pwd(char **args)
+{
+    char *cwd = (char *)malloc(sizeof(char) * 1024);
+    if (getcwd(cwd, 1024) != NULL)
+    {
+        printf("%s\n", cwd);
         return 1;
     }
-    else{
+    else
+    {
         perror("Cannot get current directory");
         return NULL;
     }
 }
 
-int execute_echo(char** toks) {
+int execute_echo(char **toks)
+{
     int i = 1;
-    while (toks[i] != NULL) {
-        if (toks[i][0] == '$') {
-            char* env_var = getenv(toks[i] + 1);
-            if (env_var != NULL) {
+    while (toks[i] != NULL)
+    {
+        if (toks[i][0] == '$')
+        {
+            char *env_var = getenv(toks[i] + 1);
+            if (env_var != NULL)
+            {
                 printf("%s ", env_var);
             }
-        } else {
+        }
+        else
+        {
             printf("%s ", toks[i]);
         }
         i++;
@@ -191,18 +174,22 @@ int execute_echo(char** toks) {
     return 1;
 }
 
-int execute_who() {
+int execute_who(char **args)
+{
     struct utmp current_record;
     int utmpfd;
     int reclen = sizeof(current_record);
 
-    if ((utmpfd = open(UTMP_FILE, O_RDONLY)) == -1) {
+    if ((utmpfd = open(UTMP_FILE, O_RDONLY)) == -1)
+    {
         perror(UTMP_FILE);
         exit(1);
     }
 
-    while (read(utmpfd, &current_record, reclen) == reclen) {
-        if (current_record.ut_type == USER_PROCESS) {
+    while (read(utmpfd, &current_record, reclen) == reclen)
+    {
+        if (current_record.ut_type == USER_PROCESS)
+        {
             printf("%-8.8s ", current_record.ut_user);
             printf("%-8.8s ", current_record.ut_line);
 
@@ -220,7 +207,8 @@ int execute_who() {
     return 1;
 }
 
-int execute_history() {
+int execute_history(char **args)
+{
     printCommandHistory();
     return 1;
 }

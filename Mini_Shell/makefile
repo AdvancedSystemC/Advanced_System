@@ -8,7 +8,6 @@ OBJ_DIR=./obj
 BIN_DIR=./bin
 DOC_DIR=./doc
 GCOV_DIR=./gcov
-GCNO_DIR=./gcno
 
 GCOVFLAGS=-O0 --coverage -lgcov -Wall -g
 
@@ -34,7 +33,6 @@ $(BIN_DIR):
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INC_FILES)
 	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
-	mv $(OBJ_DIR)/$*.gcno $(GCNO_DIR)
 
 $(EXEC): $(OBJ_FILES)
 	$(CC) -o $(BIN_DIR)/$@ -Wall $(LDFLAGS) $(OBJ_FILES)
@@ -46,12 +44,12 @@ doc:
 	doxygen $(DOC_DIR)/doxygen.conf
 
 gcov: $(GEXEC)
-	mkdir -p $(GCNO_DIR)
-	find ./ -maxdepth 1 -name '*.gcno' -exec mv {} $(GCNO_DIR) \;
-
 	# Generate some data for gcov by calling the generated binary with various options
 	$(GCOV_DIR)/$(GEXEC) -h
 	$(GCOV_DIR)/$(GEXEC) -i input -o output -v
+
+	find ./ -maxdepth 1 -name *.gcno -exec mv {} $(GCOV_DIR) \;
+	find ./ -maxdepth 1 -name *.gcda -exec mv {} $(GCOV_DIR) \;
 
 	gcov -o $(GCOV_DIR) $(GEXEC)
 	lcov -o $(GCOV_DIR)/$(LCOV_REPORT) -c -f -d $(GCOV_DIR)
@@ -68,4 +66,3 @@ mrproper: clean
 	rm -rf $(DOC_DIR)/latex/
 	rm -rf $(DOC_DIR)/html/
 	rm -rf $(GCOV_DIR)/*
-	rm -rf $(GCNO_DIR)/*
