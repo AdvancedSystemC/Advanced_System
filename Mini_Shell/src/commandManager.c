@@ -1,18 +1,28 @@
-#include "../include/commandManager.h"
-#include "../include/commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
 
+#include "../include/commandManager.h"
+#include "../include/cd.h"
+#include "../include/ps.h"
+#include "../include/exit.h"
+#include "../include/pwd.h"
+#include "../include/echo.h"
+#include "../include/history.h"
+#include "../include/typedef.h"
+
+CommandTableEntry BuiltInCommandTable[] = {
+    {"exit",execute_exit},
+    {"cd",execute_cd},
+    {"pwd",execute_pwd},
+    {"echo",execute_echo},
+    {NULL,NULL} //Terminator for the table
+};
+
 CommandTableEntry CommandTable[] = {
     {"ps", execute_ps},
-    {"exit", execute_exit},
-    {"cd", execute_cd},
-    {"pwd", execute_pwd},
-    {"echo", execute_ps},
-    {"who", execute_echo},
     {"history", execute_history},
     //{"alias",execute_ps},
     //{"unalias",deleteAlias},
@@ -38,14 +48,13 @@ Command *createCommand(char *executable, char **args, int arg_count, int has_pip
     return cmd;
 }
 
-CommandFunction findCommandFunction(const char *cmd)
+CommandFunction findCommandFunction(const char *cmd , CommandTableEntry *entry)
 {
-    for (int i = 0; CommandTable[i].name != NULL; i++)
+    for (int i = 0; entry[i].name != NULL; i++)
     {
-        if (strcmp(CommandTable[i].name, cmd) == 0)
+        if (strcmp(entry[i].name, cmd) == 0)
         {
-            printf("%s", CommandTable[i].name);
-            return CommandTable[i].function;
+            return entry[i].function;
         }
     }
 
@@ -53,6 +62,31 @@ CommandFunction findCommandFunction(const char *cmd)
 }
 
 int executeCommand(Command *cmd)
+{
+    CommandFunction commandFunction = findCommandFunction(cmd->executable,BuiltInCommandTable);
+    if(commandFunction != NULL){
+        executeBuiltInCommand(cmd,commandFunction);
+    }
+    else{
+        commandFunction = findCommandFunction(cmd->executable,CommandTable);
+        if (commandFunction != NULL)
+        {
+            executeOtherCommands(cmd,commandFunction);
+        }
+        else
+        {
+            fprintf(stderr, "Unknown command: %s\n", cmd->executable);
+            exit(EXIT_FAILURE);
+        }
+    }
+    return 0;
+}
+
+int executeBuiltInCommand(Command *cmd , CommandFunction function){
+    exit(function(cmd->args));
+}
+
+int executeOtherCommands(Command *cmd , CommandFunction function)
 {
     pid_t pid = fork();
 
@@ -77,16 +111,7 @@ int executeCommand(Command *cmd)
             close(STDERR_FILENO);
         }
 
-        CommandFunction commandFunction = findCommandFunction(cmd->executable);
-        if (commandFunction != NULL)
-        {
-            exit(commandFunction(cmd->args));
-        }
-        else
-        {
-            fprintf(stderr, "Unknown command: %s\n", cmd->executable);
-            exit(EXIT_FAILURE);
-        }
+        exit(function(cmd->args));
     }
     else
     {

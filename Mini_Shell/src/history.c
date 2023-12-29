@@ -26,3 +26,9 @@ void printCommandHistory() {
 
     fclose(historyFile);
 }
+
+int execute_history(char **args)
+{
+    printCommandHistory();
+    return 1;
+}

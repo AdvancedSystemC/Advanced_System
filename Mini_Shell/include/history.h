@@ -16,4 +16,6 @@ void addCommandToHistory(const char* command);
 */
 void printCommandHistory();
 
+int execute_history(char **args);
+
 #endif // HISTORY_H

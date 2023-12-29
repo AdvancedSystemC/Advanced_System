@@ -20,6 +20,10 @@ Command *createCommand(char *executable, char **args, int arg_count, int has_pip
  */
 int executeCommand(Command *cmd);
 
+int executeBuiltInCommand(Command *cmd , CommandFunction function);
+
+int executeOtherCommands(Command *cmd , CommandFunction function);
+
 /**
  * @brief Free memory used by a Command struct
  * @param cmd The command struct to be free
