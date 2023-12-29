@@ -35828,3 +35828,38 @@ cd test
 
 exit
 
+cat < input.txt
+
+echo < input.txt
+
+echo < input.txt
+
+echo Hello > output.txt
+
+echo < input.txt
+
+echo < input.txt
+
+echo < input.txt
+
+echo < input.txt
+
+ec < inout.txt
+
+echo < input.txt
+
+echo Hello > output.txt
+
+echo hello
+echo hello
+echo hello
+echo "bonjour jésus"
+history
+echo "hello"
+cd test
+papapa
+ls -l -a
+ps -a -l
+exit
+ps -a -l
+exit
