@@ -7,8 +7,12 @@
 Command *parseInput(const char *input)
 {
     char *inputCopy = strdup(input);
-    char *token = strtok(inputCopy, " ");
 
+    //char *newline = strchr(inputCopy, '\n');
+    //if (newline)
+    //    *newline = 0;
+
+    char *token = strtok(inputCopy, " ");
     // Extract command
     char *executable = token;
 

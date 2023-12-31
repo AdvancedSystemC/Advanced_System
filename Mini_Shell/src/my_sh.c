@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <string.h>
 
 #include "../include/history.h"
 #include "../include/display.h"
@@ -30,13 +31,30 @@ char *getDirectory()
 
 /**
  * @brief The main function of the shell program.
+ * @param argc The number of command-line arguments.
+ * @param argv The array of command-line arguments.
  * @return 0 on successful execution.
  */
-int main()
+int main(int argc, char *argv[])
 {
     initAliasManager();
 
-    if (isatty(STDIN_FILENO))
+    if (argc > 1 && strcmp(argv[1], "-c") == 0)
+    {
+        // shell is running in batch mode
+        if (argc > 2)
+        {
+            char *batchCommand = argv[2];
+            Command *userCommand = parseInput(batchCommand);
+            int exitStatus = executeCommand(userCommand);
+            freeCommand(userCommand);
+        }
+        else
+        {
+            printf("No batch command provided.\n");
+        }
+    }
+    else if (isatty(STDIN_FILENO))
     {
         // shell is running in interactive mode
         char *username = getenv("USER");
@@ -69,10 +87,6 @@ int main()
             // Clean up
             freeCommand(userCommand);
         }
-    }
-    else
-    {
-        // shell is running in non-interactive mode
     }
 
     return 0;

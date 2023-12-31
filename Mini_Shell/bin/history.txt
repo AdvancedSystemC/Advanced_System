@@ -35863,3 +35863,15 @@ ps -a -l
 exit
 ps -a -l
 exit
+exit
+
+cd Mini_Shell
+
+cd ..
+
+ls test
+
+ps
+
+cd ../
+
