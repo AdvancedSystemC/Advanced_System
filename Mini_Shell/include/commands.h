@@ -9,5 +9,6 @@ int execute_pwd(char **args);
 int execute_echo(char **toks);
 int execute_who(char **args);
 int execute_history(char **args);
+int execute_ls(char **args);
 
 #endif // COMMAND_H

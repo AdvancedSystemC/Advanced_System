@@ -3,9 +3,9 @@
  * @brief This file contains function declarations for pwd operations.
  */
 
-#ifndef PWD_H
-#define PWD_H
+#ifndef PWDCMD_H
+#define PWDCMD_H
 
 int execute_pwd(char **args);
 
-#endif // PWD_H
+#endif // PWDCMD_H

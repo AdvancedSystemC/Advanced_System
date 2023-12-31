@@ -8,7 +8,8 @@
 #include "../include/cd.h"
 #include "../include/ps.h"
 #include "../include/exit.h"
-#include "../include/pwd.h"
+#include "../include/ls.h"
+#include "../include/pwdCmd.h"
 #include "../include/echo.h"
 #include "../include/history.h"
 #include "../include/typedef.h"
@@ -24,6 +25,7 @@ CommandTableEntry BuiltInCommandTable[] = {
 CommandTableEntry CommandTable[] = {
     {"ps", execute_ps},
     {"history", execute_history},
+    {"ls", execute_ls},
     //{"alias",execute_ps},
     //{"unalias",deleteAlias},
     //{"alias-load",loadAliases},
