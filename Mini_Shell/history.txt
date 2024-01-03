@@ -1,2 +1,119 @@
 cd bin
 
+ls
+
+ls -l
+
+ls -l test
+
+echo Hello
+
+echo Hello
+
+echo Hello
+
+echo Hello
+
+echo Hello
+
+ls test
+
+exit
+
+ls
+
+ls -l
+
+ls
+
+exit
+
+ls -l
+
+ls -l 
+ls -l
+
+cd 
+
+cd ..
+
+cd ..
+
+exit ratatata
+
+exit ratatata
+
+cd ..
+
+ls
+
+exit ratatata
+
+echo Hello
+
+exit ratatata
+
+cd ratatata
+
+cd ratatata
+
+cd ..
+
+cd test
+
+cd ..
+
+exit
+
+cd ..
+
+cd ..
+
+ls
+
+ls test
+
+exit
+
+ls -l
+
+ls -l test
+
+exit
+
+ls -l
+
+ls -l
+
+ls -l
+
+ls test
+
+ls test
+
+ls
+
+exit
+
+ls
+
+exit
+
+ls test
+
+exit
+
+ls test
+
+ls .
+
+exit
+
+ls .
+
+ls bin
+
+ls
+
+ls bin
+

@@ -86,7 +86,7 @@ int executeCommand(Command *cmd)
 }
 
 int executeBuiltInCommand(Command *cmd , CommandFunction function){
-    exit(function(cmd->args));
+    function(cmd->args);
 }
 
 int executeOtherCommands(Command *cmd , CommandFunction function)

@@ -1,13 +1,21 @@
 #include <stdio.h>
 
-int execute_echo(char **toks)
+int execute_echo(char **args)
 {
+    printf("Executing built-in echo command\n");
+
     int i = 1;
-    while (toks[i] != NULL)
+    while (args[i] != NULL)
     {
-        if (toks[i][0] == '$')
+        printf("%s ", args[i]);
+        i++;
+    }
+    
+    while (args[i] != NULL)
+    {
+        if (args[i][0] == '$')
         {
-            char *env_var = getenv(toks[i] + 1);
+            char *env_var = getenv(args[i] + 1);
             if (env_var != NULL)
             {
                 printf("%s ", env_var);
@@ -15,10 +23,10 @@ int execute_echo(char **toks)
         }
         else
         {
-            printf("%s ", toks[i]);
+            printf("On passe dans le if\n");
+            printf("%s\n ", args[i]);
         }
         i++;
     }
-    printf("\n");
     return 1;
 }

@@ -4,9 +4,9 @@
 // int execute_command();
 int execute_exit(char **args);
 int execute_ps(char **args);
-int execute_cd(char **toks);
+int execute_cd(char **args);
 int execute_pwd(char **args);
-int execute_echo(char **toks);
+int execute_echo(char **args);
 int execute_who(char **args);
 int execute_history(char **args);
 int execute_ls(char **args);

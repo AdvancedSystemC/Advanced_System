@@ -56,30 +56,31 @@ void print_file_metadata(const char *filename)
            filename, permissions, pw->pw_name, gr->gr_name, file_stat.st_size, timestamp);
 }
 
-int execute_ls(char **toks)
+int execute_ls(char **args)
 {
     char *dir_to_open = ".";
-    // open the directory given in argument
-    if (toks[0] != NULL)
+    //open the directory given in argument
+    if (args[0] != NULL)
     {
-        dir_to_open = toks[0];
+        dir_to_open = args[0];
     }
 
-    DIR *directory = opendir(dir_to_open);
-    if (directory == NULL)
-    {
+
+    // Open the directory given in arguments
+    DIR* directory = opendir(dir_to_open);
+
+    if (directory == NULL) {
         perror("");
         exit(EXIT_FAILURE);
     }
 
-    struct dirent *entry = NULL;
-    while ((entry = readdir(directory)) != NULL)
-    {
-        if (entry->d_type == DT_REG || entry->d_type == DT_DIR)
-        {
+    struct dirent* entry = NULL;
+
+    while ((entry = readdir(directory)) != NULL) {
+        if (entry->d_type == DT_REG || entry->d_type == DT_DIR) {
             // Print file metadata for regular files
             char file_path[MAX_PATH_LENGTH];
-            snprintf(file_path, MAX_PATH_LENGTH, "%s/%s", toks[1], entry->d_name);
+            snprintf(file_path, MAX_PATH_LENGTH, "%s/%s", dir_to_open, entry->d_name);
             print_file_metadata(file_path);
         }
     }

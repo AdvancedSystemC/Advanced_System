@@ -8,9 +8,9 @@ Command *parseInput(const char *input)
 {
     char *inputCopy = strdup(input);
 
-    //char *newline = strchr(inputCopy, '\n');
-    //if (newline)
-    //    *newline = 0;
+    char *newline = strchr(inputCopy, '\n');
+    if (newline)
+        *newline = 0;
 
     char *token = strtok(inputCopy, " ");
     // Extract command
@@ -60,6 +60,8 @@ Command *parseInput(const char *input)
     {
         cmd->run_in_background = 0;
     }
+
+    printf("Run in Background: %s\n", cmd->run_in_background ? "Yes" : "No");
 
     return cmd;
 }

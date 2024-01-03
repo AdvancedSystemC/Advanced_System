@@ -1,15 +1,15 @@
 #include <stdio.h>
 
-int execute_cd(char **toks)
+int execute_cd(char **args)
 {
-    if (toks[1] == NULL)
+    if (args[0] == NULL)
     {
         // No argument provided, change to home directory
         chdir(getenv("HOME"));
     }
     else
     {
-        if (chdir(toks[1]) != 0)
+        if (chdir(args[0]) != 0)
         {
             perror("cd");
         }
