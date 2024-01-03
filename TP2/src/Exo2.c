@@ -1,97 +1,60 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-int main(int argc, char *argv[])
-{
+#define STDOUT 1
+#define STDERR 2
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <message>\n", argv[0]);
+        return 1;
+    }
+
+    int fd;
     pid_t pid;
-    int fd[2];
 
-    if (argc != 2)
-    {
-        printf("Erreur : nombre de paramètres incorrect.\n");
-        return 1;
-    }
-
-    if (pipe(fd) == -1)
-    {
-        perror("Erreur lors de la création du tube");
-        return 1;
-    }
+    printf("Message: %s\n", argv[1]);
 
     pid = fork();
 
-    if (pid == -1)
-    {
-        printf("Erreur : échec de la création du processus fils.\n");
+    if (pid < 0){
+        fprintf(stderr, "Fork Failed\n");
         return 1;
+    } 
+    else if (pid == 0){
+        //Child process
+        printf("Child PID: %d\n", getpid());
+
+        // Ferme le descripteur 1 (STDOUT)
+        close(STDERR);
+
+        // Ouvre en création et écriture le fichier temporaire /tmp/proc-exercice
+        fd = mkstemp("/tmp/proc-exercice");
+
+        // Exécute le programme passé en argument
+        execvp(argv[1], &argv[1]);
+
+        //Affiche le numéro du descripteur du fichier ouvert
+        printf("File descriptor: %d\n", fd);
+
+        // Exécute le programme passé en argument
+        execvp(argv[1], &argv[1]);
+
+        // En cas d'erreur lors de l'exécution du programme
+        fprintf(stderr, "Failed to execute program\n");
+        return 1;
+
     }
-
-    char filename[] = "/tmp/proc-exerciseXXXXXX";
-
-    if (pid == 0)
-    {
-        // Processus fils
-        printf("PID du processus fils : %d\n", getpid());
-        close(1);
-        close(fd[0]); // Fermer l'extrémité de lecture du tube
-
-        int fd_temp = mkstemp(filename);
-        if (fd_temp == -1)
-        {
-            perror("Erreur lors de la création du fichier temporaire");
-            exit(1);
-        }
-
-        printf("Numéro du descripteur de fichier ouvert : %d\n", fd_temp);
-        dprintf(fd[1], "%s", filename); // Écrire le nom de fichier dans le tube
-        close(fd[1]); // Fermer l'extrémité d'écriture du tube
-
-        if (execlp(argv[1], argv[1], NULL) == -1)
-        {
-            perror("Erreur lors de l'exécution du programme");
-            exit(1);
-        }
-    }
-    else
-    {
-        // Processus père
-        printf("PID du processus père : %d\n", getpid());
-
-        close(fd[1]); // Fermer l'extrémité d'écriture du tube
-
-        char filename_received[256];
-        int n = read(fd[0], filename_received, 256); // Lire le nom de fichier à partir du tube
-        if (n == -1)
-        {
-            perror("Erreur lors de la lecture du tube");
-            return 1;
-        }
-        filename_received[n] = '\0';
-
-        printf("Nom de fichier reçu : %s\n", filename_received);
-
-        wait(NULL); // Attendre que le processus fils se termine
-
-        // Ouvrir le fichier temporaire en lecture
-        FILE *file = fopen(filename_received, "r");
-        if (file == NULL)
-        {
-            perror("Erreur lors de l'ouverture du fichier temporaire");
-            return 1;
-        }
-
-        // Lire et afficher le contenu du fichier
-        char c;
-        while ((c = fgetc(file)) != EOF)
-        {
-            putchar(c);
-        }
-
-        fclose(file);
-
-        printf("That's All Folks !\n");
+    else{
+        //Processus parent
+        printf("Parent PID: %d\n" , getpid());
+        wait(NULL);
+        printf("That's All Folks!\n");
     }
 
     return 0;
