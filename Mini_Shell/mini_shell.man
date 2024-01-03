@@ -1,0 +1,32 @@
+MINI_SHELL(1)                  Mini Shell Manual                 MINI_SHELL(1)
+
+
+
+NNAAMMEE
+       mini_shell - a minimalistic shell program
+
+
+SSYYNNOOPPSSIISS
+       mmiinnii__sshheellll [_O_P_T_I_O_N]...  [--cc _c_o_m_m_a_n_d]
+
+
+DDEESSCCRRIIPPTTIIOONN
+       Mini  Shell  is  a simple command-line interpreter that allows users to
+       execute commands and interact with the operating system.
+
+
+OOPPTTIIOONNSS
+       --cc _c_o_m_m_a_n_d
+              Executes the specified command in batch mode.
+
+
+AAUUTTHHOORR
+       Written by DUVERNAY Benoit & GERBERON Alexandre.
+
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (C) 2024 MEUCH
+
+
+
+1.0                               2024-02-01                     MINI_SHELL(1)
