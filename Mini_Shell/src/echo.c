@@ -4,7 +4,7 @@ int execute_echo(char **args)
 {
     printf("Executing built-in echo command\n");
 
-    int i = 1;
+    int i = 0;
     while (args[i] != NULL)
     {
         printf("%s ", args[i]);
