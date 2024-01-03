@@ -115,15 +115,6 @@ const char* binary_optstr = "hvi:o:";
 /**
  *
 */
-void print_file_metadata(const char* filename){
-    struct stat file_stat;
-    if(stat(filename, &file_stat) == -1){
-        perror("");
-        exit(1);
-    }
-
-    printf("%s - " , filename);
-}
 
 
 
@@ -204,17 +195,21 @@ int main(int argc, char** argv)
 
     // III - ls "like"
 
-    //Open the directory given in arguments
+    // Open the directory given in arguments
     DIR* directory = opendir(bin_input_param);
-    if(directory == NULL){
+    if (directory == NULL) {
         perror("");
+        exit(EXIT_FAILURE);
     }
 
     struct dirent* entry = NULL;
 
-    while((entry = readdir(directory)) != NULL){
-        if(entry->d_type == DT_REG){
-            print_file_metadata(entry->d_name);
+    while ((entry = readdir(directory)) != NULL) {
+        if (entry->d_type == DT_REG) {
+            // Print file metadata for regular files
+            char file_path[MAX_PATH_LENGTH];
+            snprintf(file_path, MAX_PATH_LENGTH, "%s/%s", bin_input_param, entry->d_name);
+            print_file_metadata(file_path);
         }
     }
 
@@ -224,6 +219,40 @@ int main(int argc, char** argv)
     free_if_needed(bin_input_param);
     free_if_needed(bin_output_param);
 
-
     return EXIT_SUCCESS;
+}
+void print_file_metadata(const char* filename) {
+    struct stat file_stat;
+    if (stat(filename, &file_stat) == -1) {
+        perror("");
+        return;
+    }
+
+    // Extracting and formatting file permissions
+    char permissions[10];
+    format_file_permissions(file_stat.st_mode, permissions);
+
+    // Extracting and printing other file information
+    struct passwd* pw = getpwuid(file_stat.st_uid);
+    struct group* gr = getgrgid(file_stat.st_gid);
+    char timestamp[20];
+    strftime(timestamp, 20, "%Y-%m-%d %H:%M:%S", localtime(&file_stat.st_mtime));
+
+    printf("%s - Permissions: %s, Owner: %s, Group: %s, Size: %ld bytes, Modified: %s\n",
+           filename, permissions, pw->pw_name, gr->gr_name, file_stat.st_size, timestamp);
+}
+/**
+ * Get and format file permissions in the form "rwxrwxrw-"
+ */
+void format_file_permissions(mode_t mode, char* permissions) {
+    permissions[0] = (mode & S_IRUSR) ? 'r' : '-';
+    permissions[1] = (mode & S_IWUSR) ? 'w' : '-';
+    permissions[2] = (mode & S_IXUSR) ? 'x' : '-';
+    permissions[3] = (mode & S_IRGRP) ? 'r' : '-';
+    permissions[4] = (mode & S_IWGRP) ? 'w' : '-';
+    permissions[5] = (mode & S_IXGRP) ? 'x' : '-';
+    permissions[6] = (mode & S_IROTH) ? 'r' : '-';
+    permissions[7] = (mode & S_IWOTH) ? 'w' : '-';
+    permissions[8] = (mode & S_IXOTH) ? 'x' : '-';
+    permissions[9] = '\0';  // Null-terminate the string
 }
