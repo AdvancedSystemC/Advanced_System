@@ -13,6 +13,7 @@
 #include "../include/echo.h"
 #include "../include/history.h"
 #include "../include/typedef.h"
+#include <fcntl.h>
 
 CommandTableEntry BuiltInCommandTable[] = {
     {"exit",execute_exit},
@@ -46,7 +47,11 @@ Command *createCommand(char *executable, char **args, int arg_count, int has_pip
     cmd->args = args;
     cmd->arg_count = arg_count;
     cmd->has_pipe = has_pipe;
-     cmd->next_command = NULL;
+    cmd->next_command = NULL;
+    cmd->has_input_redirection = 0;
+    cmd->input_file = NULL;
+    cmd->has_output_redirection = 0;
+    cmd->output_file = NULL;
 
     return cmd;
 }
@@ -64,8 +69,74 @@ CommandFunction findCommandFunction(const char *cmd , CommandTableEntry *entry)
     return NULL;
 }
 
+void setupRedirection(Command *cmd)
+{
+    // Handle input redirection
+    if (cmd->has_input_redirection)
+    {
+        int fd_in = open(cmd->input_file, O_RDONLY);
+        if (fd_in == -1)
+        {
+            perror("Error opening input file");
+            exit(EXIT_FAILURE);
+        }
+        dup2(fd_in, STDIN_FILENO);
+        close(fd_in);
+    }
+
+    // Handle output redirection
+    if (cmd->has_output_redirection)
+    {
+        int fd_out;
+
+        // If append_output is true, open the file in append mode
+        if (cmd->append_output)
+        {
+            fd_out = open(cmd->output_file, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
+        }
+        else
+        {
+            // Otherwise, redirect to the specified file
+            fd_out = open(cmd->output_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IRGRP | S_IWGRP | S_IWUSR);
+        }
+
+        if (fd_out == -1)
+        {
+            perror("Error opening output file");
+            exit(EXIT_FAILURE);
+        }
+
+        dup2(fd_out, STDOUT_FILENO);
+        close(fd_out);
+    }
+
+    // Handle here document content
+    if (cmd->here_document_content)
+    {
+        // Open a temporary file to store the here document content
+        char tmp_filename[] = "/tmp/minishell_here_doc_XXXXXX";
+        int fd_tmp = mkstemp(tmp_filename);
+        if (fd_tmp == -1)
+        {
+            perror("Error creating temporary file for here document");
+            exit(EXIT_FAILURE);
+        }
+
+        // Write the content to the temporary file
+        write(fd_tmp, cmd->here_document_content, strlen(cmd->here_document_content));
+        lseek(fd_tmp, 0, SEEK_SET);
+
+        // Redirect stdin to the temporary file
+        dup2(fd_tmp, STDIN_FILENO);
+
+        // Close the temporary file (it will be deleted automatically)
+        close(fd_tmp);
+    }
+}
+
 int executeCommand(Command *cmd)
 {
+    setupRedirection(cmd);
     CommandFunction commandFunction = findCommandFunction(cmd->executable,BuiltInCommandTable);
     if(commandFunction != NULL){
         executeBuiltInCommand(cmd,commandFunction);
@@ -85,8 +156,21 @@ int executeCommand(Command *cmd)
     return 0;
 }
 
+void restoreTerminal() {
+    // Revert standard input to terminal
+    int new_stdin = open("/dev/tty", O_RDONLY);
+    dup2(new_stdin, STDIN_FILENO);
+    close(new_stdin);
+
+    // Revert standard output to terminal
+    int new_stdout = open("/dev/tty", O_WRONLY);
+    dup2(new_stdout, STDOUT_FILENO);
+    close(new_stdout);
+}
+
 int executeBuiltInCommand(Command *cmd , CommandFunction function){
     function(cmd->args);
+    restoreTerminal();
 }
 
 int executeOtherCommands(Command *cmd , CommandFunction function)
@@ -132,48 +216,48 @@ int executeOtherCommands(Command *cmd , CommandFunction function)
             return WEXITSTATUS(status);
         }
     }
-    else{
-    pid_t pid = fork();
-
-    if (pid == -1)
-    {
-        perror("Fork failed");
-        exit(EXIT_FAILURE);
-    }
-    else if (pid == 0)
-    {
-        // Child process
-        if (cmd->run_in_background)
-        {
-            if (setsid() == -1)
-            {
-                perror("setsid failed");
-                exit(EXIT_FAILURE);
-            }
-
-            close(STDIN_FILENO);
-            close(STDOUT_FILENO);
-            close(STDERR_FILENO);
-        }
-
-        exit(function(cmd->args));
-    }
     else
     {
-        // Parent process
+        pid_t pid = fork();
 
-        if (!cmd->run_in_background)
+        if (pid == -1)
         {
-            int status;
-            waitpid(pid, &status, 0);
-            return WEXITSTATUS(status);
+            perror("Fork failed");
+            exit(EXIT_FAILURE);
+        }
+        else if (pid == 0)
+        {
+            // Child process
+            if (cmd->run_in_background)
+            {
+                if (setsid() == -1)
+                {
+                    perror("setsid failed");
+                    exit(EXIT_FAILURE);
+                }
+
+                close(STDIN_FILENO);
+                close(STDOUT_FILENO);
+                close(STDERR_FILENO);
+            }
+
+            exit(function(cmd->args));
         }
         else
         {
-            // Background execution
-            return 0;
+            // Parent process
+            if (!cmd->run_in_background)
+            {
+                int status;
+                waitpid(pid, &status, 0);
+                return WEXITSTATUS(status);
+            }
+            else
+            {
+                // Background execution
+                return 0;
+            }
         }
-    }
     }
 }
 

@@ -117,3 +117,135 @@ ls
 
 ls bin
 
+ps
+
+echo Hello
+
+echo Hello
+
+echo $PWD
+
+echo Hello
+
+echo Hello > output.txt
+
+echo hello
+
+echo "Mamamia" > output.txt
+
+echo Mamamia > output.txt
+
+echo < output.txt
+
+Mamamia
+
+echo Hello > output.txt
+
+echo hello
+
+echo hello 
+history
+
+history
+
+history
+
+echo Hello > output.txt
+
+echo Hello > output.txt
+
+ls > output.txt
+
+echo hello > output.txt
+
+echo < input.txt
+
+echo < output.txt
+
+Redirection setup done
+
+ls < output.txt
+
+Redirection setup done
+
+echo < output.txt
+
+Redirection setup done
+
+echo Hello > output.txt
+
+echo Hello > output.txt
+
+echo Hello > output.txt
+
+echo hhhh > output.txt
+
+echo HHHHH
+
+echo -l hhhhh
+
+make
+
+echo 
+echo hello
+
+echo hello
+
+cd ..
+
+history
+
+cd
+
+cd
+
+cd
+
+echo
+
+echo
+
+make
+
+echo
+
+echo
+
+echo
+echo
+echo
+echo
+echo > input.txt
+echo Hello > output.txt
+echo hh
+history
+echo > output.txt
+echo > output.txt
+history
+echo hello > output.txt
+aaa
+echo Hello > output.txt
+echo Hello > output.txt
+aaaaa
+echo > output.txt
+ls
+aa
+echo Hello 
+ls 
+ls
+echo Hello > output.txt
+echo < input.txt
+echo < output.txt
+echo TCHUTCHU > output.txt
+echo < output.txt
+echo < output.txt
+echo hello >> output.txt
+exit
+history
+echo meuch >> output.txt
+exit
+cat hello >> output2.txt
+echo hello >> output2.txt
+echo hellomeuch >> output2.txt
+history
+echo sigsau >> output2.txt

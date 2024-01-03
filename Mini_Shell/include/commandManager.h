@@ -30,4 +30,8 @@ int executeOtherCommands(Command *cmd , CommandFunction function);
  */
 void freeCommand(Command *cmd);
 
+void setupRedirection(Command *cmd);
+
+void restoreTerminal();
+
 #endif /* COMMAND_MANAGER_H */
