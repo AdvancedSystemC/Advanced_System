@@ -16,6 +16,20 @@
 
 #define MAX_PATH_LENGTH 4096
 
+// Structure pour stocker les informations sur les fichiers
+struct FileData {
+    char file_path[MAX_PATH_LENGTH];
+    off_t file_size;
+};
+
+// Fonction de comparaison pour qsort()
+int compare_file_size(const void* a, const void* b) {
+    const struct FileData* file_a = (const struct FileData*)a;
+    const struct FileData* file_b = (const struct FileData*)b;
+
+    return (file_a->file_size - file_b->file_size);
+}
+
 /**
  * Get and format file permissions in the form "rwxrwxrw-"
  */
@@ -58,30 +72,134 @@ void print_file_metadata(const char *filename)
 
 int execute_ls(char **args)
 {
-    char *dir_to_open = ".";
-    //open the directory given in argument
+    int recursive = 0;
+    int list = 0;
+    int show_all = 0;
+    int show_inode = 0;
+    int no_options = 1;
+
+    // Parsing options
     if (args[0] != NULL)
+    {
+        if (strcmp(args[0], "-R") == 0)
+        {
+            recursive = 1;
+            no_options = 0;
+        }
+        else if (strcmp(args[0], "-l") == 0)
+        {
+            list = 1;
+            no_options = 0;
+        }
+        else if (strcmp(args[0], "-a") == 0)
+        {
+            show_all = 1;
+            no_options = 0;
+        }
+        else if (strcmp(args[0], "-i") == 0)
+        {
+            show_inode = 1;
+            no_options = 0;
+        }
+        else
+        {
+            no_options = 1;
+        }
+    }
+    char *dir_to_open = ".";
+    // open the directory given in argument
+    if (no_options == 0 && args[1] != NULL)
+    {
+        dir_to_open = args[1];
+    }
+    else if (no_options == 1 && args[0] != NULL)
     {
         dir_to_open = args[0];
     }
-
-
     // Open the directory given in arguments
-    DIR* directory = opendir(dir_to_open);
+    DIR *directory = opendir(dir_to_open);
 
-    if (directory == NULL) {
+    if (directory == NULL)
+    {
         perror("");
         exit(EXIT_FAILURE);
     }
 
-    struct dirent* entry = NULL;
+    struct dirent *entry = NULL;
 
-    while ((entry = readdir(directory)) != NULL) {
-        if (entry->d_type == DT_REG || entry->d_type == DT_DIR) {
-            // Print file metadata for regular files
+    while ((entry = readdir(directory)) != NULL)
+    {
+        if (show_all == 1)
+        {
+            printf("%s\n", "show all");
+        }
+        if (show_all == 0 && entry->d_name[0] == '.')
+        {
+            continue; // Ignorer les fichiers cachés sauf si -a est spécifié
+        }
+
+        if (recursive && (entry->d_type == DT_REG || entry->d_type == DT_DIR))
+        {
+            return execute_ls_recursive(dir_to_open);
+        }
+
+        if (list && (entry->d_type == DT_REG || entry->d_type == DT_DIR))
+        {
             char file_path[MAX_PATH_LENGTH];
             snprintf(file_path, MAX_PATH_LENGTH, "%s/%s", dir_to_open, entry->d_name);
             print_file_metadata(file_path);
+        }
+        if (show_inode && (entry->d_type == DT_REG || entry->d_type == DT_DIR))
+        {
+            printf("%ld ", entry->d_ino);
+            char file_path[MAX_PATH_LENGTH];
+            snprintf(file_path, MAX_PATH_LENGTH, "%s/%s", dir_to_open, entry->d_name);
+            printf("%s ", file_path);
+            // Maintenant, vous pouvez utiliser file_path pour afficher ou manipuler le chemin avec l'inode
+        }
+        if ((no_options || show_all) && (entry->d_type == DT_REG || entry->d_type == DT_DIR))
+        {
+            char file_path[MAX_PATH_LENGTH];
+            snprintf(file_path, MAX_PATH_LENGTH, "%s/%s", dir_to_open, entry->d_name);
+            // print file_path
+            printf("%s\n", file_path);
+        }
+    }
+
+    closedir(directory);
+
+    return EXIT_SUCCESS;
+}
+int execute_ls_recursive(const char *dir_to_open)
+{
+    // Ouvrir le répertoire donné en argument
+    DIR *directory = opendir(dir_to_open);
+    if (directory == NULL)
+    {
+        perror("");
+        exit(EXIT_FAILURE);
+    }
+
+    struct dirent *entry = NULL;
+
+    while ((entry = readdir(directory)) != NULL)
+    {
+        if (entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+        {
+            // Afficher les répertoires seulement si ce ne sont pas "." ou ".."
+            char file_path[MAX_PATH_LENGTH];
+            snprintf(file_path, MAX_PATH_LENGTH, "%s/%s", dir_to_open, entry->d_name);
+            printf("%s\n", file_path);
+
+            // Récursion pour parcourir les sous-répertoires
+            execute_ls_recursive(file_path);
+        }
+        else if (entry->d_type == DT_REG)
+        {
+            // Afficher les fichiers réguliers
+            char file_path[MAX_PATH_LENGTH];
+            snprintf(file_path, MAX_PATH_LENGTH, "%s/%s", dir_to_open, entry->d_name);
+            printf("%s\n", file_path);
         }
     }
 
