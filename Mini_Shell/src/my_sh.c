@@ -71,8 +71,9 @@ int main(int argc, char *argv[])
 
             if (fgets(userInput, sizeof(userInput), stdin) != NULL)
             {
-                // Remove the newline character from the input
-                userInput[strcspn(userInput, "\n")] = 0;
+                char *newline = strchr(userInput, '\n');
+                if (newline)
+                    *newline = 0;
             }
 
             // Input Treatment

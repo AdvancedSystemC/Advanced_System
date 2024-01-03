@@ -2,15 +2,7 @@
 
 int execute_echo(char **args)
 {
-    printf("Executing built-in echo command\n");
-
     int i = 0;
-    while (args[i] != NULL)
-    {
-        printf("%s ", args[i]);
-        i++;
-    }
-    
     while (args[i] != NULL)
     {
         if (args[i][0] == '$')
@@ -23,7 +15,6 @@ int execute_echo(char **args)
         }
         else
         {
-            printf("On passe dans le if\n");
             printf("%s\n ", args[i]);
         }
         i++;

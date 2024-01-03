@@ -21,6 +21,12 @@ typedef struct
     int arg_count;
     int has_pipe;
     int run_in_background;
+    int has_input_redirection;
+    char* input_file;
+    int has_output_redirection;
+    char* output_file;
+    char *here_document_content;
+    int append_output;
     struct Command *next_command;
 } Command;
 
